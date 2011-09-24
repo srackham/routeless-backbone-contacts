@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Routeless Backbone Contacts</title>
+  <meta name="viewport" content="width=device-width, user-scalable=no">
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+
+<div id="page">
+  <!-- Templates are rendered here -->
+</div>
+
+
+<!-- Templates -->
+<script id="list-template" type="text/x-underscore-template">
+  <header>
+    <h1>Routeless Backbone Contacts</h1>
+    <div class="toolbar">
+      <button class="create">New Contact</button>
+      <button class="clear">Clear All</button>
+      <button class="import" >Import Data</button>
+    </div>
+    <div class="statusbar"><%= contacts.length + ' contacts' %></div>
+  </header>
+  <ul id="list">
+    <% contacts.each(function(contact){ %>
+      <li><a class="show" data-id="<%= contact.id %>"><%= contact.getName() %></a>
+    <% }); %>
+  </ul>
+</script>
+
+<script id="show-template" type="text/x-underscore-template">
+  <header>
+    <h1><%= contact.getName() %></h1>
+  </header>
+  <table class="show">
+    <tr> <td>Address <td><%= contact.getAddress() %>
+    <tr> <td>Phone   <td><%= contact.getPhone() %>
+    <tr> <td>Mobile  <td><%= contact.getMobile() %>
+    <tr> <td>Email   <td><a href="mailto:<%= contact.getEmail() %>"><%= contact.getEmail() %></a>
+    <tr> <td>Id      <td><%= contact.id %>
+    <tr> <td><td>
+      <button class="edit">Edit</button>
+      <button class="delete">Delete</button>
+      <button class="list">View List</button>
+  </table>
+</script>
+
+<script id="edit-template" type="text/x-underscore-template">
+  <header>
+    <h1><%= contact.getName() || '&nbsp;' %></h1>
+  </header>
+  <table class="edit">
+    <tr><td>Name<td>
+    <input type="text" name="name" autofocus required value="<%= contact.getName() %>">
+
+    <tr><td>Address<td>
+    <textarea rows="3" name="address"><%= contact.getAddress() %></textarea>
+
+    <tr><td>Phone<td>
+    <input type="tel" name="phone" value="<%= contact.getPhone() %>">
+
+    <tr><td>Mobile<td>
+    <input type="tel" name="mobile" value="<%= contact.getMobile() %>">
+
+    <tr><td>Email<td>
+    <input type="email" name="email" value="<%= contact.getEmail() %>">
+
+    <tr><td>Id<td>
+    <input type="text" name="id" readonly value="<%= contact.id %>">
+
+    <tr><td><td>
+    <button class="save">Save</button>
+    <button class="cancel">Cancel</button>
+
+    <tr><td><td class="error">
+  </table>
+</script>
+
+
+<!-- Execute scripts last (after HTML elements have been parsed) -->
+<script type="text/javascript" charset="utf-8" src="lib/jquery-1.6.2.js"></script>
+<script type="text/javascript" charset="utf-8" src="lib/underscore-1.1.7.js"></script>
+<script type="text/javascript" charset="utf-8" src="lib/backbone-0.5.3.js"></script>
+<script type="text/javascript" charset="utf-8" src="lib/backbone.localStorage-1.0.js"></script>
+<script type="text/javascript" charset="utf-8" src="js/data.js"></script>
+<script type="text/javascript" charset="utf-8" src="js/application.js"></script>
+
+</body>
+</html>

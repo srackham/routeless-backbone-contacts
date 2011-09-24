@@ -1,0 +1,284 @@
+= Routeless Backbone.js Contacts
+:max-width: 50em
+:caption:
+
+:blogpost-title: Routeless Backbone Contacts
+:blogpost-status: published
+:blogpost-doctype: article
+:blogpost-posttype: post
+:blogpost-categories: Backbone.js, CoffeeScript
+
+//References
+:backbone: http://documentcloud.github.com/backbone/[Backbone.js]
+:underscore: http://documentcloud.github.com/underscore/[Underscore.js]
+:coffeescript: http://jashkenas.github.com/coffee-script/[CoffeeScript]
+:single-page-application: http://en.wikipedia.org/wiki/Single-page_application[Single&nbsp;Page&nbsp;Application]
+:webstorage: http://en.wikipedia.org/wiki/Web_Storage[Web&nbsp;Storage]
+:phonegap: http://www.phonegap.com/[PhoneGap]
+:stylus: http://learnboost.github.com/stylus/[Stylus]
+:jquery: http://jquery.com/[jQuery]
+:mongoose: http://code.google.com/p/mongoose/[Mongoose]
+:webstorage-adapter: https://github.com/jeromegn/Backbone.localStorage[Backbone&nbsp;localStorage&nbsp;Adapter]
+:github: https://github.com/srackham/routeless-backbone-contacts
+:github-files: {github}/blob/master
+
+You don't need a URL router to write client-side applications.
+
+'Routeless Backbone.js Contacts' is a totally client-side CRUD
+tutorial application written using {coffeescript}, {stylus},
+{backbone} and {jquery} which are a perfect match for writing concise,
+readable well structured web applications.
+
+- The source is {github}[on Github].
+- Uses DOM events exclusively for UI navigation.
+- The contacts data is persisted locally using browser {webstorage}.
+- Templates are written using {underscore} templates (included with
+  {backbone}).
+
+
+== Screenshots
+=== ListContactView
+image::contacts-list.png[]
+
+=== ShowContactView
+image::contacts-show.png[]
+
+=== EditContactView
+image::contacts-edit.png[]
+
+
+== Going routeless
+It's a mindset thing. If you come from a server-side web applications
+background your first instinct is to use a router and
+http://en.wikipedia.org/wiki/Fragment_identifier[fragment identifiers]
+to emulate browser page navigation -- go down this route you soon find
+that trying to maintain a consistent back-button browser history is
+time consuming, messy and ultimately unnecessary.  Single page
+applications don't need a back-button (or any browser chrome),
+especially if they are bundled as pseudo-native mobile apps with
+something like {phonegap} or packaged for the desktop, for example as
+http://code.google.com/chrome/extensions/apps.html[Google Chrome
+Packaged Apps].
+
+'Routeless Backbone.js Contacts' resides at a single
+http://en.wikipedia.org/wiki/Fragment_identifier[unfragmented URL] --
+user interface navigation is managed exclusively by DOM events.
+Button and link elements deal with the click events client-side (you
+are not POSTing form data to a server, so 'form' elements and 'submit'
+buttons are not necessary).  If the application were to persist data
+externally then then the data POSTS and GETS would be handled
+transparently by a Backbone database adapter.
+
+
+== Running the application
+Once you have downloaded the {github}[source from Github] open the
+`index.html` file in your browser. Press the 'Import Data' button to
+load the example contacts database.
+
+[IMPORTANT]
+===========
+Unlike Google Chrome, neither Firefox 6 or IE9 like persisting Web
+Storage from file based URLs and you will need to open the application
+via a web server. I use {mongoose} (a neat little single-executable
+cross-platform web server) for testing.  Once you've installed
+'mongoose':
+
+- 'cd' to the directory containing `index.html`
+- Then execute the 'mongoose' command and open your web browser at
+  'localhost:8080'.
+===========
+
+
+== The source
+This post should be read side-by-side with the source, it's very
+readable (although a basic understanding of {coffeescript}, HTML and
+{jquery} is recommended).
+
+{github-files}/index.html[index.html]:: Application page HTML and view templates.
+{github-files}/js/application.coffee[application.coffee]:: Application, models and views.
+{github-files}/js/data.js[data.js]:: Canned data (100 fictitious contacts) loaded
+by the 'Import Data' command.
+{github-files}/css/main.styl[main.styl]:: Stylus CSS.
+{github-files}/css/helpers.styl[helpers.styl], {github-files}/css/gradients.styl[gradients.styl]:: CSS helper functions.
+
+HTML5 markup is used throughout.  All the logic is confined to
+{github-files}/js/application.coffee[application.coffee] (around 160
+lines of code).  The beauty of {coffeescript} is that the code is
+concise and virtually self-documenting, for example, here's the event
+handler in the ListContactView that responds to the 'Clear All' button
+click:
+
+----
+clear: (e) ->
+    return if not confirm 'About to delete all data.'
+    contact.destroy() for contact in @collection.toArray()
+    @render()
+----
+
+
+== Application structure
+=== The app object
+There is a single global instance 'app' of the 'App' class which:
+
+- Initializes and namespaces global data (collections and views).
+- Contains a few generic methods to allow programmatic inter-view
+  navigation -- this allows views to call one another and not have to
+  share any information about each other.
+- Starts the application (with `app.start()`).
+
+=== Models and Collections
+A single `app.contacts` collection of Contact models is persisted
+locally using the {webstorage-adapter}. A single store is instantiated
+and attached to the 'ContactModel', the same store is referenced by
+the 'ContactCollection'.
+
+=== Views
+The CRUD user interface is implemented by three Backbone.js views --
+'ListView', 'ShowView' and 'EditView' (the 'EditView' is also used to
+create new contacts).
+
+- Each view handles the set of DOM events defined by the View's
+  'events' property.
+- The 'events' property routes DOM events to a handler within the
+  View.
+- When a matching DOM event occurs the View handler is called and
+  passed a http://api.jquery.com/category/events/event-object/[jQuery
+  event object].
+
+This example (from the 'ListContactView')  uses a
+http://ejohn.org/blog/html-5-data-attributes/[custom data attribute]
+('data-id') to pass the contact ID from the anchor element via a click
+event object.
+
+DOM event registration:
+
+----
+events:
+    'click a.show': 'show'
+----
+
+Link click handler:
+
+----
+show: (e) ->
+    @model = @collection.get e.target.getAttribute('data-id')
+    @render()
+----
+
+Template link markup:
+
+----
+<a class="show" data-id="<%= contact.id %>"><%= contact.getName() %></a>
+----
+
+It would have been nice to have used the HTML5 DOM dataset property to
+retrieve the 'data-id' attribute (`e.target.dataset.id`) but it does
+not currently work in IE9, Safari or Android browsers.
+
+=== Libraries
+The app uses the following JavaScript libraries (in the `lib`
+directory):
+
+- {backbone}
+- {jquery}
+- {underscore}
+- The {webstorage-adapter} persists models to the local disk using the
+  browser http://dev.w3.org/html5/webstorage/[Web Storage] API.
+
+
+== Techniques
+=== Load scripts at the end of the page body
+Place script tags last in the page body, just before the closing body
+tag. This ensures the page elements elements have been parsed and can
+be referenced when the scripts execute and allows you to safely
+reference page elements from class property initializers.
+See
+http://stackoverflow.com/questions/3037725/is-it-wrong-to-place-the-script-tag-after-the-body-tag[this
+stackoverflow discussion].
+
+=== Intra-application links do not need href's
+Dropping the 'href' ensures there are no changes to the browser URL or
+history.
+
+
+== CSS and HTML Tips
+- {stylus} is to CSS as CoffeeScript is to JavaScript, use it to keep
+  your CSS http://en.wikipedia.org/wiki/Don't_repeat_yourself[DRY] and
+  to maintain your sanity.
+
+- Use http://learnboost.github.com/stylus/docs/import.html[Stylus
+  imports] to unclutter your main CSS.
+
+- CSS padding vs margins:
+  * Margins define the element's relationship to other elements
+    (spacing) and are context specific i.e. an element's margins
+    will change depending on where it is used in the application.
+  * Padding styles an elements appearance and isn't a context
+    sensitive as the element margins.
+  * The 'width' property 'does not include the margins, border or
+    padding'.
+
+- Use HTML5's concise syntax, it may seem wrong after years of XML
+  indoctrination but it's not, it's easier to read and your fingers
+  will thank you. Examples:
+
+  * Closing tag omission:
++
+----
+<tr><td>Foo<td>Bar                  YES
+<tr><td>Foo</td><td>Bar</td></tr>   NO
+----
+
+  * Minimized attributes:
++
+----
+readonly                            YES
+readonly="readonly"                 NO
+----
+
+  * Empty elements don't need explicit termination:
++
+----
+<img src="me.png">                  YES
+<img src="me.png" />                NO
+----
+
+- Length and size:
+
+  * Use em units to set size properties on elements that display text,
+    it'll make it much easier to resize your app.
+  * To get exact placements you'll need to use pixels, but this can
+    probably be confined to non-text elements.
+  * Use Stylus arithmetic expressions to maintain the size of
+    interdependent page elements so that changing a single size will
+    ensure the depend sizes are adjusted automatically (DRY again).
+
+- Be careful assigning 'id' attributes in templates, do so only if the
+  template will never appear more than once on a page. If in doubt
+  assign 'class' attributes instead of 'id' attributes.
+
+- Tables are not bad, in fact they are very good for laying out
+  application pages (which are quite different to document oriented
+  websites).
+
+- Don't put CSS 'style' attributes in HTML template markup -- this
+  should be obvious.
+
+- Start with a clean slate, reset user-agent (browser) document
+  oriented CSS defaults:
++
+----
+* {
+  font-size: 20px;
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+}
+----
+
+
+== References
+- Elf Sternberg's
+  http://www.elfsternberg.com/2011/08/22/backbone-store-version-20-backbonejs-coffeescript-haml-stylus-edition/[The
+  Backbone Store, version 2.0].
+

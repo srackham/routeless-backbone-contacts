@@ -1,0 +1,26 @@
+= Routeless Backbone.js Contacts
+:max-width: 50em
+
+//References
+:backbone: http://documentcloud.github.com/backbone/[Backbone.js]
+:underscore: http://documentcloud.github.com/underscore/[Underscore.js]
+:coffeescript: http://jashkenas.github.com/coffee-script/[CoffeeScript]
+:webstorage: http://en.wikipedia.org/wiki/Web_Storage[Web&nbsp;Storage]
+:stylus: http://learnboost.github.com/stylus/[Stylus]
+:jquery: http://jquery.com/[jQuery]
+
+You don't need a URL router to write client-side applications.
+
+'Routeless Backbone.js Contacts' is a totally client-side CRUD
+tutorial application written using {coffeescript}, {stylus},
+{backbone} and {jquery} which are a perfect match for writing concise,
+readable well structured web applications.
+
+- Uses DOM events exclusively for UI navigation.
+- The contacts data is persisted locally using browser {webstorage}.
+- Templates are written using {underscore} templates (included with
+  {backbone}).
+
+Project documentation at the
+http://srackham.wordpress.com/2011/09/22/routeless-backbone-contacts/[Routeless
+Backbone.js Contacts blog post].

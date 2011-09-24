@@ -1,0 +1,104 @@
+@import 'gradients'
+@import 'helpers'
+
+WIDTH = 30em
+PRIMARY-COLOR = #59595e
+SECONDARY-COLOR = #1d74b7
+LINK-COLOR = #1d74b7
+WASH-COLOR = #f5f7f9
+
+// Reset user-agent defaults.
+*
+  color PRIMARY-COLOR
+  font-size 20px
+  font-family sans-serif
+  margin 0
+  padding 0
+
+body
+  width WIDTH
+  margin 0.2em
+
+h1
+  color SECONDARY-COLOR
+  font-size 1.5em
+  margin-top-bottom 0.2em
+  padding 0.2em
+  background linear-gradient(top, white 0%, #e5ebee 15%, #e5ebee 85%, white 100%)
+
+a
+  color LINK-COLOR
+  text-decoration underline
+  &:hover
+    cursor pointer
+
+input, textarea
+  border 2px solid silver
+  outline none
+  border-radius 0.2em
+
+button
+  padding-left-right 0.1em
+  min-width 4em
+
+table
+  border-collapse collapse
+  border-spacing: 0
+  td
+    padding 0.2em
+
+.error
+  color red
+  font-weight bold
+
+.statusbar
+  font-size .75em
+
+[readonly]
+  color silver
+
+:invalid
+  border-color red
+  box-shadow 0 0 5px rgba(255, 0, 0, .8)
+
+//:required
+//  border-color #88a
+//  box-shadow 0 0 5px rgba(0, 0, 255, .5)
+
+table.show, table.edit
+  margin-top-bottom 0.5em
+  td
+    vertical-align top
+    &:first-child
+      text-align right
+      padding-right 0.5em
+    &:nth-child(1)
+      color SECONDARY-COLOR
+  td:nth-child(2), input, textarea
+    min-width WIDTH * 0.833
+  button
+    margin-top 0.2em
+
+table.show
+  // Stripe second column at odd rows.
+  tr:nth-child(odd)
+    td:nth-child(2)
+      background WASH-COLOR
+  // The address field in the first row wraps.
+  tr:first-child
+    td:nth-child(2)
+      white-space pre-line
+
+table.edit
+  // Stripe the second column.
+  td:nth-child(2)
+    background WASH-COLOR
+
+ul#list
+  list-style-type none
+  margin-top 0.5em
+  li
+    padding 0.2em
+    &:nth-child(odd)
+      background WASH-COLOR
+
