@@ -151,6 +151,9 @@ class EditContactView extends Backbone.View
 
 app = new App
 
+# Dummy console.log for Internet Explorer.
+if typeof window.console is 'undefined' then window.console = log: ->
+
 $(document).ready ->
     console.log 'start app'
     app.start()

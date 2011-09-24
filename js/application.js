@@ -217,6 +217,11 @@
     return EditContactView;
   })();
   app = new App;
+  if (typeof window.console === 'undefined') {
+    window.console = {
+      log: function() {}
+    };
+  }
   $(document).ready(function() {
     console.log('start app');
     return app.start();
