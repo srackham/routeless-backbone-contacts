@@ -22,6 +22,8 @@
 :github: https://github.com/srackham/routeless-backbone-contacts
 :github-files: {github}/blob/master
 
+*Published*: 2010-09-24
+
 You don't need a URL router to write client-side applications.
 
 'Routeless Backbone.js Contacts' is a totally client-side CRUD
@@ -34,6 +36,8 @@ readable well structured web applications.
 - The contacts data is persisted locally using browser {webstorage}.
 - Templates are written using {underscore} templates (included with
   {backbone}).
+
+pass::[<!--more-->]
 
 
 == Screenshots
@@ -278,7 +282,7 @@ readonly="readonly"                 NO
 
 
 == References
-- Elf Sternberg's
+- E. Mathieu Sternberg's
   http://www.elfsternberg.com/2011/08/22/backbone-store-version-20-backbonejs-coffeescript-haml-stylus-edition/[The
   Backbone Store, version 2.0].
 
