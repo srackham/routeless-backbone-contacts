@@ -8,53 +8,54 @@
 </head>
 <body>
 
-<div id="page">
-  <!-- Templates are rendered here -->
+<h1>Routeless Backbone Contacts</h1>
+<div id="ribbon">
+  <!-- ribbon-template -->
+</div>
+<div id="status">
+  <!-- status-template -->
+</div>
+<div id="content">
+  <div id="list">
+    <!-- list-template -->
+  </div>
+  <div id="detail">
+    <!-- detail-template -->
+  </div>
 </div>
 
 
 <!-- Templates -->
+<script id="ribbon-template" type="text/x-underscore-template">
+  <div>
+    <button class="create">New Contact</button>
+    <button class="clear">Clear All</button>
+    <button class="import" >Import Data</button>
+  </div>
+  <div>
+    <label>Search</label>
+    <input class="search" type="text" autofocus>
+  </div>
+</script>
+
+<script id="status-template" type="text/x-underscore-template">
+  <div class="message">
+    <%= contacts.length + ' matching contacts' %>
+  </div>
+</script>
+
 <script id="list-template" type="text/x-underscore-template">
-  <header>
-    <h1>Routeless Backbone Contacts</h1>
-    <div class="toolbar">
-      <button class="create">New Contact</button>
-      <button class="clear">Clear All</button>
-      <button class="import" >Import Data</button>
-    </div>
-    <div class="statusbar"><%= contacts.length + ' contacts' %></div>
-  </header>
-  <ul id="list">
-    <% contacts.each(function(contact){ %>
-      <li><a class="show" data-id="<%= contact.id %>"><%= contact.getName() %></a>
+  <ul>
+    <% _.each(contacts, function(contact){ %>
+      <li data-id="<%= contact.id %>"><%= contact.getName() %>
     <% }); %>
   </ul>
 </script>
 
-<script id="show-template" type="text/x-underscore-template">
-  <header>
-    <h1><%= contact.getName() %></h1>
-  </header>
-  <table class="show">
-    <tr> <td>Address <td><%= contact.getAddress() %>
-    <tr> <td>Phone   <td><%= contact.getPhone() %>
-    <tr> <td>Mobile  <td><%= contact.getMobile() %>
-    <tr> <td>Email   <td><a href="mailto:<%= contact.getEmail() %>"><%= contact.getEmail() %></a>
-    <tr> <td>Id      <td><%= contact.id %>
-    <tr> <td><td>
-      <button class="edit">Edit</button>
-      <button class="delete">Delete</button>
-      <button class="list">View List</button>
-  </table>
-</script>
-
-<script id="edit-template" type="text/x-underscore-template">
-  <header>
-    <h1><%= contact.getName() || '&nbsp;' %></h1>
-  </header>
-  <table class="edit">
+<script id="detail-template" type="text/x-underscore-template">
+  <table class="detail">
     <tr><td>Name<td>
-    <input type="text" name="name" autofocus required value="<%= contact.getName() %>">
+    <input type="text" name="name" required value="<%= contact.getName() %>">
 
     <tr><td>Address<td>
     <textarea rows="3" name="address"><%= contact.getAddress() %></textarea>
@@ -73,7 +74,9 @@
 
     <tr><td><td>
     <button class="save">Save</button>
-    <button class="cancel">Cancel</button>
+    <% if (!contact.isNew()) { %>
+      <button class="delete">Delete</button>
+    <% }; %>
 
     <tr><td><td class="error">
   </table>

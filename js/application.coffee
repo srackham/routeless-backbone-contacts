@@ -3,38 +3,28 @@
 #
 
 class App
-    contacts: null
-    listView: null
-    showView: null
-    editView: null
-
     constructor: ->
-        @contacts = new ContactCollection
-        @listView = new ListContactView {collection: @contacts}
-        @showView = new ShowContactView {collection: @contacts}
-        @editView = new EditContactView {collection: @contacts}
+        @_contacts = new ContactCollection
+        @_ribbonView = new RibbonView {collection: @_contacts}
+        @_statusView = new StatusView {collection: @_contacts}
+        @_listView = new ListView {collection: @_contacts}
+        @_detailView = new DetailView {collection: @_contacts}
 
     start: ->
-        @list()
-
-    list: ->
-        @listView.render()
-
-    show: (model) ->
-        @showView.render model
-
-    edit: (model) ->
-        @editView.render model
+        @_ribbonView.render()
+        @_statusView.render()
+        @_listView.render()
+        @_contacts.cursor.set()
 
 
 class Contact extends Backbone.Model
     localStorage: new Store 'contacts'
 
-    getName: -> @get('name')
-    getAddress: -> @get('address')
-    getPhone: -> @get('phone')
-    getMobile: -> @get('mobile')
-    getEmail: -> @get('email')
+    getName: -> @get 'name'
+    getAddress: -> @get 'address'
+    getPhone: -> @get 'phone'
+    getMobile: -> @get 'mobile'
+    getEmail: -> @get 'email'
 
     validate: (attrs) ->
         if not attrs.name then 'Contact name required'
@@ -42,7 +32,6 @@ class Contact extends Backbone.Model
 
 class ContactCollection extends Backbone.Collection
     model: Contact
-
     localStorage: Contact::localStorage
 
     comparator: (contact) ->
@@ -50,86 +39,144 @@ class ContactCollection extends Backbone.Collection
 
     initialize: ->
         @fetch()
+        @cursor = new Cursor @
+        @filter = new Filter @
 
 
-class ListContactView extends Backbone.View
-    el: $('#page')
+# Filters a contacts collection by name.
+class Filter
+    constructor: (collection) ->
+        @_query = ''
+        @_collection = collection
 
-    template: _.template $('#list-template').html()
+    set: (query) ->
+        return if query == @_query
+        @_query = query
+        @_collection.trigger 'filter'
+
+    selection: ->
+        @_collection.select (contact) =>
+            contact.getName().match RegExp(@_query or '.*', 'i')
+
+
+# A Cursor object represents the currently selected model in a collection.
+class Cursor
+    constructor: (collection) ->
+        @_collection = collection
+        @_collection.bind 'remove', => @set()
+        @_collection.bind 'reset', => @set()
+        @_collection.bind 'filter', => @set()
+
+    get: -> @_model
+
+    set: (model=null) ->
+        # Select first filtered model if 'model' is null.
+        @return if model == @_model
+        @_model = model or @_collection.filter.selection()[0] or null
+        @_collection.trigger 'select'
+
+
+class RibbonView extends Backbone.View
+    el: $('#ribbon')
+
+    template: _.template $('#ribbon-template').html()
 
     events:
         'click button.create': 'create'
         'click button.clear': 'clear'
         'click button.import': 'import'
+        'keyup input.search': 'search'
 
     render: ->
-        console.log "render list #{@cid}"
-        @el.html @template({contacts: @collection})
+        console.log "render ribbon #{@cid}"
+        @el.html @template()
 
     create: (e) ->
-        app.edit new Contact
+        @collection.cursor.set new Contact
 
     clear: (e) ->
         return if not confirm 'About to delete all data.'
-        contact.destroy() for contact in @collection.toArray()
-        @render()
+        contact.destroy {silent: true} for contact in @collection.toArray()
+        @collection.reset()
 
     import: (e) ->
         # Load canned contacts from data.js
         return if not confirm 'About to import data.'
-        @collection.create contact for contact in $IMPORT_DATA
-        @render()
+        @collection.create contact, {silent: true} for contact in $IMPORT_DATA
+        @collection.trigger 'reset', @collection
+
+    search: (e) ->
+        @collection.filter.set $(e.target).val()
 
 
-class ShowContactView extends Backbone.View
-    el: $('#page')
+class StatusView extends Backbone.View
+    el: $('#status')
 
-    template: _.template $('#show-template').html()
+    template: _.template $('#status-template').html()
+
+    initialize: ->
+        @collection.bind 'add', @render
+        @collection.bind 'remove', @render
+        @collection.bind 'reset', @render
+        @collection.bind 'filter', @render
+        @collection.bind 'change', @render
+
+    render: =>
+        console.log "render status #{@cid}"
+        @el.html @template {contacts: @collection.filter.selection()}
+
+
+class ListView extends Backbone.View
+    el: $('#list')
 
     events:
-        'click button.delete': 'delete'
-        'click button.edit': 'edit'
-        'click button.list': 'list'
-        'click a.show': 'show'
+        'click li': 'select'
 
-    render: (model=@model) ->
-        console.log "render contact #{@cid}"
-        @model = model
-        @el.html @template({contact: @model})
+    template: _.template $('#list-template').html()
 
-    list: (e) ->
-        app.list()
+    initialize: ->
+        @collection.bind 'add', @render
+        @collection.bind 'remove', @render
+        @collection.bind 'reset', @render
+        @collection.bind 'filter', @render
+        @collection.bind 'change', @render
+        @collection.bind 'select', @renderCursor
 
-    show: (e) ->
-        # HTML5 DOM dataset property does not work on IE9, Safari or Android.
-        #@model = @collection.get e.target.dataset.id
-        @model = @collection.get e.target.getAttribute('data-id')
-        @render()
+    render: =>
+        console.log "render list #{@cid}"
+        @el.html @template {contacts: @collection.filter.selection()}
+        @renderCursor()
 
-    delete: (e) ->
-        @model.destroy()
-        app.list()
+    renderCursor: =>
+        console.log "render cursor #{@cid}"
+        @$('li.cursor').removeClass 'cursor'
+        li = @$( "[data-id=#{@collection.cursor.get()?.id}]")
+        li.addClass 'cursor'
 
-    edit: (e) ->
-        app.edit @model
+    select: (e) ->
+        model = @collection.get e.target.getAttribute('data-id')
+        @collection.cursor.set model
 
 
-class EditContactView extends Backbone.View
-    el: $('#page')
+class DetailView extends Backbone.View
+    el: $('#detail')
 
-    template: _.template $('#edit-template').html()
+    template: _.template $('#detail-template').html()
 
     events:
         'click button.save': 'save'
-        'click button.cancel': 'cancel'
+        'click button.delete': 'delete'
 
-    render: (model) ->
-        console.log "edit contact #{@cid}"
-        @model = model
-        @el.html @template({contact: @model})
+    initialize: ->
+        @collection.bind 'select', @render
+
+    render: =>
+        console.log "render detail #{@cid}"
+        @model = @collection.cursor.get()
+        @el.html if @model is null then '' else @template({contact: @model})
 
     save: (e) ->
-        console.log "save contact #{@cid}"
+        console.log "save detail #{@cid}"
         @model.save {
             name: @$('[name="name"]').val()
             address: @$('[name="address"]').val()
@@ -139,20 +186,22 @@ class EditContactView extends Backbone.View
         },
         {
             success: (model, resp) =>
-                @collection.add @model, {at: 0} if not @model.collection
-                app.show @model
+                if not @model.collection
+                    @collection.add @model, {at: 0}
+                    @collection.cursor.set @model
             error: (model, error) =>
-                @el.find('.error').text error
+                @$('.error').text error
         }
 
-    cancel: (e) ->
-        if @model.isNew() then app.list() else app.show @model
+    delete: (e) ->
+        console.log "destroy contact #{@cid}"
+        @model.destroy()
 
 
 app = new App
 
 # Dummy console.log for Internet Explorer.
-if typeof window.console is 'undefined' then window.console = log: ->
+if window.console is undefined then window.console = log: ->
 
 $(document).ready ->
     console.log 'start app'

@@ -22,7 +22,8 @@
 :github: https://github.com/srackham/routeless-backbone-contacts
 :github-files: {github}/blob/master
 
-*Published*: 2010-09-24
+*Published*: 2010-09-24 +
+*Updted*: 2010-10-03 +
 
 You don't need a URL router to write client-side applications.
 
@@ -32,10 +33,16 @@ tutorial application written using {coffeescript}, {stylus},
 readable well structured web applications.
 
 - The source is {github}[on Github].
++
+NOTE: This release described in this post is at the '1.0' tag.
+
 - Uses DOM events exclusively for UI navigation.
 - The contacts data is persisted locally using browser {webstorage}.
 - Templates are written using {underscore} templates (included with
   {backbone}).
+
+NOTE: A second version of this tutorial application [has been posted],
+it builds on the material covered in this post.
 
 pass::[<!--more-->]
 

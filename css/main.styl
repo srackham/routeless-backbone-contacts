@@ -1,45 +1,26 @@
 @import 'gradients'
 @import 'helpers'
 
-WIDTH = 30em
-PRIMARY-COLOR = #59595e
-SECONDARY-COLOR = #1d74b7
-LINK-COLOR = #1d74b7
-WASH-COLOR = #f5f7f9
+FONT_SIZE = 20px  // Change this to resize the application viewport.
+PAGE_WIDTH = 40em
+CONTENT_HEIGHT = 20em
+LIST_WIDTH = 10em
+LABEL_WIDTH = 5em
+PRIMARY_COLOR = #59595e
+SECONDARY_COLOR = #1d74b7
+LINK_COLOR = #1d74b7
+WASH_COLOR = #f5f7f9
+CURSOR_BACKGROUND = #ddd
+BORDER = 2px solid lightgrey
 
 // Reset user-agent defaults.
 *
-  color PRIMARY-COLOR
-  font-size 20px
+  color PRIMARY_COLOR
+  font-size FONT_SIZE
   font-family sans-serif
   margin 0
   padding 0
-
-body
-  width WIDTH
-  margin 0.2em
-
-h1
-  color SECONDARY-COLOR
-  font-size 1.5em
-  margin-top-bottom 0.2em
-  padding 0.2em
-  background linear-gradient(top, white 0%, #e5ebee 15%, #e5ebee 85%, white 100%)
-
-a
-  color LINK-COLOR
-  text-decoration underline
-  &:hover
-    cursor pointer
-
-input, textarea
-  border 2px solid silver
-  outline none
-  border-radius 0.2em
-
-button
-  padding-left-right 0.1em
-  min-width 4em
+  box-sizing border-box
 
 table
   border-collapse collapse
@@ -47,12 +28,38 @@ table
   td
     padding 0.2em
 
+body
+  width PAGE_WIDTH
+  margin 0.2em
+
+h1
+  color SECONDARY_COLOR
+  font-size 1.5em
+  margin-top-bottom 0.2em
+  padding 0.2em
+  background linear-gradient(top, white 0%, #e5ebee 15%, #e5ebee 85%, white 100%)
+
+a
+  color LINK_COLOR
+  text-decoration underline
+  &:hover
+    cursor pointer
+
+label
+  color SECONDARY_COLOR
+
+input, textarea
+  border BORDER
+  outline none
+  border-radius 0.2em
+
+button
+  padding-left-right 0.1em
+  min-width 4em
+
 .error
   color red
   font-weight bold
-
-.statusbar
-  font-size .75em
 
 [readonly]
   color silver
@@ -65,7 +72,7 @@ table
 //  border-color #88a
 //  box-shadow 0 0 5px rgba(0, 0, 255, .5)
 
-table.show, table.edit
+table.detail
   margin-top-bottom 0.5em
   td
     vertical-align top
@@ -73,32 +80,49 @@ table.show, table.edit
       text-align right
       padding-right 0.5em
     &:nth-child(1)
-      color SECONDARY-COLOR
+      color SECONDARY_COLOR
+  td:nth-child(1)
+    width LABEL_WIDTH
+  td:nth-child(2)
+    background WASH_COLOR
   td:nth-child(2), input, textarea
-    min-width WIDTH * 0.833
+    width PAGE_WIDTH - LIST_WIDTH - LABEL_WIDTH - 0.2em
   button
     margin-top 0.2em
 
-table.show
-  // Stripe second column at odd rows.
-  tr:nth-child(odd)
-    td:nth-child(2)
-      background WASH-COLOR
-  // The address field in the first row wraps.
-  tr:first-child
-    td:nth-child(2)
-      white-space pre-line
+#ribbon
+  div:nth-child(1)
+    float left
+  div:nth-child(2)
+    text-align right
 
-table.edit
-  // Stripe the second column.
-  td:nth-child(2)
-    background WASH-COLOR
+#status
+  margin-top 0.2em
+  .message
+    font-size .75em
+    text-align right
 
-ul#list
-  list-style-type none
+#content
   margin-top 0.5em
-  li
-    padding 0.2em
-    &:nth-child(odd)
-      background WASH-COLOR
 
+#list
+  height CONTENT_HEIGHT
+  width LIST_WIDTH
+  border BORDER
+  overflow auto
+  float left
+  ul
+    list-style-type none
+    li
+      padding 0.2em
+      color SECONDARY_COLOR
+      &:nth-child(odd)
+        background WASH_COLOR
+      &:hover
+        cursor pointer
+      &.cursor
+        background CURSOR_BACKGROUND !important
+
+#detail
+  height CONTENT_HEIGHT
+  border BORDER

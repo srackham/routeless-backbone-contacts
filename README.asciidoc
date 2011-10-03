@@ -9,7 +9,7 @@
 :stylus: http://learnboost.github.com/stylus/[Stylus]
 :jquery: http://jquery.com/[jQuery]
 
-You don't need a URL router to write client-side applications.
+Versions 1.0 and 2.0 of the 'Routeless Backbone.js Contacts' tutorial.
 
 'Routeless Backbone.js Contacts' is a totally client-side CRUD
 tutorial application written using {coffeescript}, {stylus},
@@ -21,6 +21,10 @@ readable well structured web applications.
 - Templates are written using {underscore} templates (included with
   {backbone}).
 
-Project documentation at the
+Version 2.0 documentation::
+http://srackham.wordpress.com/2011/10/02/routeless-backbone-contacts-2-0/[Routeless
+Backbone Contacts 2.0] blog post.
+
+Version 1.0 documentation::
 http://srackham.wordpress.com/2011/09/22/routeless-backbone-contacts/[Routeless
-Backbone.js Contacts blog post].
+Backbone Contacts] blog post.

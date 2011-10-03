@@ -1,5 +1,5 @@
 (function() {
-  var App, Contact, ContactCollection, EditContactView, ListContactView, ShowContactView, app;
+  var App, Contact, ContactCollection, Cursor, DetailView, Filter, ListView, RibbonView, StatusView, app;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
@@ -9,33 +9,26 @@
     return child;
   }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   App = (function() {
-    App.prototype.contacts = null;
-    App.prototype.listView = null;
-    App.prototype.showView = null;
-    App.prototype.editView = null;
     function App() {
-      this.contacts = new ContactCollection;
-      this.listView = new ListContactView({
-        collection: this.contacts
+      this._contacts = new ContactCollection;
+      this._ribbonView = new RibbonView({
+        collection: this._contacts
       });
-      this.showView = new ShowContactView({
-        collection: this.contacts
+      this._statusView = new StatusView({
+        collection: this._contacts
       });
-      this.editView = new EditContactView({
-        collection: this.contacts
+      this._listView = new ListView({
+        collection: this._contacts
+      });
+      this._detailView = new DetailView({
+        collection: this._contacts
       });
     }
     App.prototype.start = function() {
-      return this.list();
-    };
-    App.prototype.list = function() {
-      return this.listView.render();
-    };
-    App.prototype.show = function(model) {
-      return this.showView.render(model);
-    };
-    App.prototype.edit = function(model) {
-      return this.editView.render(model);
+      this._ribbonView.render();
+      this._statusView.render();
+      this._listView.render();
+      return this._contacts.cursor.set();
     };
     return App;
   })();
@@ -78,32 +71,80 @@
       return contact.getName();
     };
     ContactCollection.prototype.initialize = function() {
-      return this.fetch();
+      this.fetch();
+      this.cursor = new Cursor(this);
+      return this.filter = new Filter(this);
     };
     return ContactCollection;
   })();
-  ListContactView = (function() {
-    __extends(ListContactView, Backbone.View);
-    function ListContactView() {
-      ListContactView.__super__.constructor.apply(this, arguments);
+  Filter = (function() {
+    function Filter(collection) {
+      this._query = '';
+      this._collection = collection;
     }
-    ListContactView.prototype.el = $('#page');
-    ListContactView.prototype.template = _.template($('#list-template').html());
-    ListContactView.prototype.events = {
+    Filter.prototype.set = function(query) {
+      if (query === this._query) {
+        return;
+      }
+      this._query = query;
+      return this._collection.trigger('filter');
+    };
+    Filter.prototype.selection = function() {
+      return this._collection.select(__bind(function(contact) {
+        return contact.getName().match(RegExp(this._query || '.*', 'i'));
+      }, this));
+    };
+    return Filter;
+  })();
+  Cursor = (function() {
+    function Cursor(collection) {
+      this._collection = collection;
+      this._collection.bind('remove', __bind(function() {
+        return this.set();
+      }, this));
+      this._collection.bind('reset', __bind(function() {
+        return this.set();
+      }, this));
+      this._collection.bind('filter', __bind(function() {
+        return this.set();
+      }, this));
+    }
+    Cursor.prototype.get = function() {
+      return this._model;
+    };
+    Cursor.prototype.set = function(model) {
+      if (model == null) {
+        model = null;
+      }
+      if (model === this._model) {
+        this["return"];
+      }
+      this._model = model || this._collection.filter.selection()[0] || null;
+      return this._collection.trigger('select');
+    };
+    return Cursor;
+  })();
+  RibbonView = (function() {
+    __extends(RibbonView, Backbone.View);
+    function RibbonView() {
+      RibbonView.__super__.constructor.apply(this, arguments);
+    }
+    RibbonView.prototype.el = $('#ribbon');
+    RibbonView.prototype.template = _.template($('#ribbon-template').html());
+    RibbonView.prototype.events = {
       'click button.create': 'create',
       'click button.clear': 'clear',
-      'click button.import': 'import'
+      'click button.import': 'import',
+      'keyup input.search': 'search'
     };
-    ListContactView.prototype.render = function() {
-      console.log("render list " + this.cid);
-      return this.el.html(this.template({
-        contacts: this.collection
-      }));
+    RibbonView.prototype.render = function() {
+      console.log("render ribbon " + this.cid);
+      return this.el.html(this.template());
     };
-    ListContactView.prototype.create = function(e) {
-      return app.edit(new Contact);
+    RibbonView.prototype.create = function(e) {
+      return this.collection.cursor.set(new Contact);
     };
-    ListContactView.prototype.clear = function(e) {
+    RibbonView.prototype.clear = function(e) {
       var contact, _i, _len, _ref;
       if (!confirm('About to delete all data.')) {
         return;
@@ -111,82 +152,118 @@
       _ref = this.collection.toArray();
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         contact = _ref[_i];
-        contact.destroy();
+        contact.destroy({
+          silent: true
+        });
       }
-      return this.render();
+      return this.collection.reset();
     };
-    ListContactView.prototype["import"] = function(e) {
+    RibbonView.prototype["import"] = function(e) {
       var contact, _i, _len;
       if (!confirm('About to import data.')) {
         return;
       }
       for (_i = 0, _len = $IMPORT_DATA.length; _i < _len; _i++) {
         contact = $IMPORT_DATA[_i];
-        this.collection.create(contact);
+        this.collection.create(contact, {
+          silent: true
+        });
       }
-      return this.render();
+      return this.collection.trigger('reset', this.collection);
     };
-    return ListContactView;
+    RibbonView.prototype.search = function(e) {
+      return this.collection.filter.set($(e.target).val());
+    };
+    return RibbonView;
   })();
-  ShowContactView = (function() {
-    __extends(ShowContactView, Backbone.View);
-    function ShowContactView() {
-      ShowContactView.__super__.constructor.apply(this, arguments);
+  StatusView = (function() {
+    __extends(StatusView, Backbone.View);
+    function StatusView() {
+      this.render = __bind(this.render, this);
+      StatusView.__super__.constructor.apply(this, arguments);
     }
-    ShowContactView.prototype.el = $('#page');
-    ShowContactView.prototype.template = _.template($('#show-template').html());
-    ShowContactView.prototype.events = {
-      'click button.delete': 'delete',
-      'click button.edit': 'edit',
-      'click button.list': 'list',
-      'click a.show': 'show'
+    StatusView.prototype.el = $('#status');
+    StatusView.prototype.template = _.template($('#status-template').html());
+    StatusView.prototype.initialize = function() {
+      this.collection.bind('add', this.render);
+      this.collection.bind('remove', this.render);
+      this.collection.bind('reset', this.render);
+      this.collection.bind('filter', this.render);
+      return this.collection.bind('change', this.render);
     };
-    ShowContactView.prototype.render = function(model) {
-      if (model == null) {
-        model = this.model;
-      }
-      console.log("render contact " + this.cid);
-      this.model = model;
+    StatusView.prototype.render = function() {
+      console.log("render status " + this.cid);
       return this.el.html(this.template({
-        contact: this.model
+        contacts: this.collection.filter.selection()
       }));
     };
-    ShowContactView.prototype.list = function(e) {
-      return app.list();
-    };
-    ShowContactView.prototype.show = function(e) {
-      this.model = this.collection.get(e.target.getAttribute('data-id'));
-      return this.render();
-    };
-    ShowContactView.prototype["delete"] = function(e) {
-      this.model.destroy();
-      return app.list();
-    };
-    ShowContactView.prototype.edit = function(e) {
-      return app.edit(this.model);
-    };
-    return ShowContactView;
+    return StatusView;
   })();
-  EditContactView = (function() {
-    __extends(EditContactView, Backbone.View);
-    function EditContactView() {
-      EditContactView.__super__.constructor.apply(this, arguments);
+  ListView = (function() {
+    __extends(ListView, Backbone.View);
+    function ListView() {
+      this.renderCursor = __bind(this.renderCursor, this);
+      this.render = __bind(this.render, this);
+      ListView.__super__.constructor.apply(this, arguments);
     }
-    EditContactView.prototype.el = $('#page');
-    EditContactView.prototype.template = _.template($('#edit-template').html());
-    EditContactView.prototype.events = {
+    ListView.prototype.el = $('#list');
+    ListView.prototype.events = {
+      'click li': 'select'
+    };
+    ListView.prototype.template = _.template($('#list-template').html());
+    ListView.prototype.initialize = function() {
+      this.collection.bind('add', this.render);
+      this.collection.bind('remove', this.render);
+      this.collection.bind('reset', this.render);
+      this.collection.bind('filter', this.render);
+      this.collection.bind('change', this.render);
+      return this.collection.bind('select', this.renderCursor);
+    };
+    ListView.prototype.render = function() {
+      console.log("render list " + this.cid);
+      this.el.html(this.template({
+        contacts: this.collection.filter.selection()
+      }));
+      return this.renderCursor();
+    };
+    ListView.prototype.renderCursor = function() {
+      var li, _ref;
+      console.log("render cursor " + this.cid);
+      this.$('li.cursor').removeClass('cursor');
+      li = this.$("[data-id=" + ((_ref = this.collection.cursor.get()) != null ? _ref.id : void 0) + "]");
+      return li.addClass('cursor');
+    };
+    ListView.prototype.select = function(e) {
+      var model;
+      model = this.collection.get(e.target.getAttribute('data-id'));
+      return this.collection.cursor.set(model);
+    };
+    return ListView;
+  })();
+  DetailView = (function() {
+    __extends(DetailView, Backbone.View);
+    function DetailView() {
+      this.render = __bind(this.render, this);
+      DetailView.__super__.constructor.apply(this, arguments);
+    }
+    DetailView.prototype.el = $('#detail');
+    DetailView.prototype.template = _.template($('#detail-template').html());
+    DetailView.prototype.events = {
       'click button.save': 'save',
-      'click button.cancel': 'cancel'
+      'click button.delete': 'delete'
     };
-    EditContactView.prototype.render = function(model) {
-      console.log("edit contact " + this.cid);
-      this.model = model;
-      return this.el.html(this.template({
+    DetailView.prototype.initialize = function() {
+      return this.collection.bind('select', this.render);
+    };
+    DetailView.prototype.render = function() {
+      console.log("render detail " + this.cid);
+      this.model = this.collection.cursor.get();
+      return this.el.html(this.model === null ? '' : this.template({
         contact: this.model
       }));
     };
-    EditContactView.prototype.save = function(e) {
-      console.log("save contact " + this.cid);
+    DetailView.prototype.save = function(e) {
+      console.log("save detail " + this.cid);
       return this.model.save({
         name: this.$('[name="name"]').val(),
         address: this.$('[name="address"]').val(),
@@ -199,25 +276,22 @@
             this.collection.add(this.model, {
               at: 0
             });
+            return this.collection.cursor.set(this.model);
           }
-          return app.show(this.model);
         }, this),
         error: __bind(function(model, error) {
-          return this.el.find('.error').text(error);
+          return this.$('.error').text(error);
         }, this)
       });
     };
-    EditContactView.prototype.cancel = function(e) {
-      if (this.model.isNew()) {
-        return app.list();
-      } else {
-        return app.show(this.model);
-      }
+    DetailView.prototype["delete"] = function(e) {
+      console.log("destroy contact " + this.cid);
+      return this.model.destroy();
     };
-    return EditContactView;
+    return DetailView;
   })();
   app = new App;
-  if (typeof window.console === 'undefined') {
+  if (window.console === void 0) {
     window.console = {
       log: function() {}
     };
