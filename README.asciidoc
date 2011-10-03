@@ -21,10 +21,15 @@ readable well structured web applications.
 - Templates are written using {underscore} templates (included with
   {backbone}).
 
-Version 2.0 documentation::
-http://srackham.wordpress.com/2011/10/02/routeless-backbone-contacts-2-0/[Routeless
-Backbone Contacts 2.0] blog post.
+[cols="2,5,3",width="75%",options="header"]
+|==========================================
+|Version |Documentation |Source
 
-Version 1.0 documentation::
-http://srackham.wordpress.com/2011/09/22/routeless-backbone-contacts/[Routeless
-Backbone Contacts] blog post.
+|2.0
+|http://srackham.wordpress.com/2011/10/02/routeless-backbone-contacts-2-0/[Routeless Backbone Contacts 2.0]
+|At tag 2.0
+
+|1.0
+|http://srackham.wordpress.com/2011/09/22/routeless-backbone-contacts/[Routeless Backbone Contacts]
+|At tag 1.0
+|==========================================

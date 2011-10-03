@@ -23,7 +23,7 @@
 :github-files: {github}/blob/master
 
 *Published*: 2010-09-24 +
-*Updted*: 2010-10-03 +
+*Updated*: 2010-10-03 +
 
 You don't need a URL router to write client-side applications.
 
