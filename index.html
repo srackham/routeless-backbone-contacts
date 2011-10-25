@@ -47,7 +47,7 @@
 <script id="list-template" type="text/x-underscore-template">
   <ul>
     <% _.each(contacts, function(contact){ %>
-      <li data-id="<%= contact.id %>"><%= contact.getName() %>
+      <li data-id="<%= contact.id %>"><%= contact.name %>
     <% }); %>
   </ul>
 </script>
@@ -55,19 +55,19 @@
 <script id="detail-template" type="text/x-underscore-template">
   <table class="detail">
     <tr><td>Name<td>
-    <input type="text" name="name" required value="<%= contact.getName() %>">
+    <input type="text" name="name" required value="<%= contact.name %>">
 
     <tr><td>Address<td>
-    <textarea rows="3" name="address"><%= contact.getAddress() %></textarea>
+    <textarea rows="3" name="address"><%= contact.address %></textarea>
 
     <tr><td>Phone<td>
-    <input type="tel" name="phone" value="<%= contact.getPhone() %>">
+    <input type="tel" name="phone" value="<%= contact.phone %>">
 
     <tr><td>Mobile<td>
-    <input type="tel" name="mobile" value="<%= contact.getMobile() %>">
+    <input type="tel" name="mobile" value="<%= contact.mobile %>">
 
     <tr><td>Email<td>
-    <input type="email" name="email" value="<%= contact.getEmail() %>">
+    <input type="email" name="email" value="<%= contact.email %>">
 
     <tr><td>Id<td>
     <input type="text" name="id" readonly value="<%= contact.id %>">

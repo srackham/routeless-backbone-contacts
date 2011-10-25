@@ -1,6 +1,7 @@
 #
 # Routeless Backbone Contacts
 #
+'use strict'
 
 class App
     constructor: ->
@@ -17,14 +18,24 @@ class App
         @_contacts.cursor.set()
 
 
-class Contact extends Backbone.Model
-    localStorage: new Store 'contacts'
+class BaseModel extends Backbone.Model
+    # Create model attribute getter/setter property.
+    @attribute = (attr) ->
+        Object.defineProperty @prototype, attr,
+            get: -> @get attr
+            set: (value) ->
+                attrs = {}
+                attrs[attr] = value
+                @set attrs
 
-    getName: -> @get 'name'
-    getAddress: -> @get 'address'
-    getPhone: -> @get 'phone'
-    getMobile: -> @get 'mobile'
-    getEmail: -> @get 'email'
+
+class Contact extends BaseModel
+    @attribute 'name'
+    @attribute 'address'
+    @attribute 'phone'
+    @attribute 'mobile'
+    @attribute 'email'
+    localStorage: new Store 'contacts'
 
     validate: (attrs) ->
         if not attrs.name then 'Contact name required'
@@ -35,7 +46,7 @@ class ContactCollection extends Backbone.Collection
     localStorage: Contact::localStorage
 
     comparator: (contact) ->
-        contact.getName()
+        contact.name
 
     initialize: ->
         @fetch()
@@ -56,7 +67,7 @@ class Filter
 
     selection: ->
         @_collection.select (contact) =>
-            contact.getName().match RegExp(@_query or '.*', 'i')
+            contact.name.match RegExp(@_query or '.*', 'i')
 
 
 # A Cursor object represents the currently selected model in a collection.
@@ -86,6 +97,7 @@ class RibbonView extends Backbone.View
         'click button.clear': 'clear'
         'click button.import': 'import'
         'keyup input.search': 'search'
+        'change input.search': 'search' # So Selenium test works.
 
     render: ->
         console.log "render ribbon #{@cid}"

@@ -1,22 +1,22 @@
 @import 'gradients'
 @import 'helpers'
 
-FONT_SIZE = 20px  // Change this to resize the application viewport.
-PAGE_WIDTH = 40em
-CONTENT_HEIGHT = 20em
-LIST_WIDTH = 10em
-LABEL_WIDTH = 5em
-PRIMARY_COLOR = #59595e
-SECONDARY_COLOR = #1d74b7
-LINK_COLOR = #1d74b7
-WASH_COLOR = #f5f7f9
-CURSOR_BACKGROUND = #ddd
-BORDER = 2px solid lightgrey
+$font_size = 20px  // Change this to resize the application viewport.
+$page_width = 40em
+$content_height = 20em
+$list_width = 10em
+$label_width = 5em
+$primary_color = #59595e
+$secondary_color = #1d74b7
+$link_color = #1d74b7
+$wash_color = #f5f7f9
+$cursor_background = #ddd
+$border = 2px solid lightgrey
 
 // Reset user-agent defaults.
 *
-  color PRIMARY_COLOR
-  font-size FONT_SIZE
+  color $primary_color
+  font-size $font_size
   font-family sans-serif
   margin 0
   padding 0
@@ -29,27 +29,27 @@ table
     padding 0.2em
 
 body
-  width PAGE_WIDTH
+  width $page_width
   margin 0.2em
 
 h1
-  color SECONDARY_COLOR
+  color $secondary_color
   font-size 1.5em
   margin-top-bottom 0.2em
   padding 0.2em
   background linear-gradient(top, white 0%, #e5ebee 15%, #e5ebee 85%, white 100%)
 
 a
-  color LINK_COLOR
+  color $link_color
   text-decoration underline
   &:hover
     cursor pointer
 
 label
-  color SECONDARY_COLOR
+  color $secondary_color
 
 input, textarea
-  border BORDER
+  border $border
   outline none
   border-radius 0.2em
 
@@ -80,13 +80,13 @@ table.detail
       text-align right
       padding-right 0.5em
     &:nth-child(1)
-      color SECONDARY_COLOR
+      color $secondary_color
   td:nth-child(1)
-    width LABEL_WIDTH
+    width $label_width
   td:nth-child(2)
-    background WASH_COLOR
+    background $wash_color
   td:nth-child(2), input, textarea
-    width PAGE_WIDTH - LIST_WIDTH - LABEL_WIDTH - 0.2em
+    width $page_width - $list_width - $label_width - 0.2em
   button
     margin-top 0.2em
 
@@ -106,23 +106,23 @@ table.detail
   margin-top 0.5em
 
 #list
-  height CONTENT_HEIGHT
-  width LIST_WIDTH
-  border BORDER
+  height $content_height
+  width $list_width
+  border $border
   overflow auto
   float left
   ul
     list-style-type none
     li
       padding 0.2em
-      color SECONDARY_COLOR
+      color $secondary_color
       &:nth-child(odd)
-        background WASH_COLOR
+        background $wash_color
       &:hover
         cursor pointer
       &.cursor
-        background CURSOR_BACKGROUND !important
+        background $cursor_background !important
 
 #detail
-  height CONTENT_HEIGHT
-  border BORDER
+  height $content_height
+  border $border

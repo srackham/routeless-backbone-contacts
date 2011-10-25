@@ -1,5 +1,6 @@
 (function() {
-  var App, Contact, ContactCollection, Cursor, DetailView, Filter, ListView, RibbonView, StatusView, app;
+  'use strict';
+  var App, BaseModel, Contact, ContactCollection, Cursor, DetailView, Filter, ListView, RibbonView, StatusView, app;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
@@ -32,27 +33,37 @@
     };
     return App;
   })();
+  BaseModel = (function() {
+    __extends(BaseModel, Backbone.Model);
+    function BaseModel() {
+      BaseModel.__super__.constructor.apply(this, arguments);
+    }
+    BaseModel.attribute = function(attr) {
+      return Object.defineProperty(this.prototype, attr, {
+        get: function() {
+          return this.get(attr);
+        },
+        set: function(value) {
+          var attrs;
+          attrs = {};
+          attrs[attr] = value;
+          return this.set(attrs);
+        }
+      });
+    };
+    return BaseModel;
+  })();
   Contact = (function() {
-    __extends(Contact, Backbone.Model);
+    __extends(Contact, BaseModel);
     function Contact() {
       Contact.__super__.constructor.apply(this, arguments);
     }
+    Contact.attribute('name');
+    Contact.attribute('address');
+    Contact.attribute('phone');
+    Contact.attribute('mobile');
+    Contact.attribute('email');
     Contact.prototype.localStorage = new Store('contacts');
-    Contact.prototype.getName = function() {
-      return this.get('name');
-    };
-    Contact.prototype.getAddress = function() {
-      return this.get('address');
-    };
-    Contact.prototype.getPhone = function() {
-      return this.get('phone');
-    };
-    Contact.prototype.getMobile = function() {
-      return this.get('mobile');
-    };
-    Contact.prototype.getEmail = function() {
-      return this.get('email');
-    };
     Contact.prototype.validate = function(attrs) {
       if (!attrs.name) {
         return 'Contact name required';
@@ -68,7 +79,7 @@
     ContactCollection.prototype.model = Contact;
     ContactCollection.prototype.localStorage = Contact.prototype.localStorage;
     ContactCollection.prototype.comparator = function(contact) {
-      return contact.getName();
+      return contact.name;
     };
     ContactCollection.prototype.initialize = function() {
       this.fetch();
@@ -91,7 +102,7 @@
     };
     Filter.prototype.selection = function() {
       return this._collection.select(__bind(function(contact) {
-        return contact.getName().match(RegExp(this._query || '.*', 'i'));
+        return contact.name.match(RegExp(this._query || '.*', 'i'));
       }, this));
     };
     return Filter;
@@ -135,7 +146,8 @@
       'click button.create': 'create',
       'click button.clear': 'clear',
       'click button.import': 'import',
-      'keyup input.search': 'search'
+      'keyup input.search': 'search',
+      'change input.search': 'search'
     };
     RibbonView.prototype.render = function() {
       console.log("render ribbon " + this.cid);
