@@ -22,8 +22,8 @@
 :github: https://github.com/srackham/routeless-backbone-contacts
 :version1: http://srackham.wordpress.com/2011/09/22/routeless-backbone-contacts
 
-*Published*: 2010-10-03 +
-*Updated*: 2010-10-25
+*Published*: 2011-10-03 +
+*Updated*: 2011-10-25
 
 This post describes a revamped version 2.0 of my {version1}[original
 Routeless Backbone Contacts application]. The material covered here

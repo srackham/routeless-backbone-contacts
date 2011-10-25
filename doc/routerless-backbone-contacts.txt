@@ -22,8 +22,8 @@
 :github: https://github.com/srackham/routeless-backbone-contacts
 :github-files: {github}/blob/master
 
-*Published*: 2010-09-24 +
-*Updated*: 2010-10-03 +
+*Published*: 2011-09-24 +
+*Updated*: 2011-10-03 +
 
 You don't need a URL router to write client-side applications.
 
