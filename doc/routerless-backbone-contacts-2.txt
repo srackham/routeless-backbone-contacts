@@ -20,10 +20,10 @@
 :mongoose: http://code.google.com/p/mongoose/[Mongoose]
 :webstorage-adapter: https://github.com/jeromegn/Backbone.localStorage[Backbone&nbsp;localStorage&nbsp;Adapter]
 :github: https://github.com/srackham/routeless-backbone-contacts
-:github-files: {github}/blob/master
 :version1: http://srackham.wordpress.com/2011/09/22/routeless-backbone-contacts
 
-*Published*: 2010-10-03
+*Published*: 2010-10-03 +
+*Updated*: 2010-10-25
 
 This post describes a revamped version 2.0 of my {version1}[original
 Routeless Backbone Contacts application]. The material covered here
@@ -50,9 +50,11 @@ tutorial application written using {coffeescript}, {stylus},
 {backbone} and {jquery} which are a perfect match for writing concise,
 readable well structured web applications.
 
-- The source is {github}[on Github]
-+
-NOTE: This release described in this post is at the '2.0' tag.
+- The source is {github}[on Github]:
+  * This release described in this post is at the '2.0' tag.
+  * A subsequent release includes
+    http://srackham.wordpress.com/2011/10/25/testing-coffeescript-apps-with-selenium/[Selenium
+    tests] and is at the '3.0.' tag.
 
 - The contacts data is persisted locally using browser {webstorage}.
 - Templates are written using {underscore} templates (included with

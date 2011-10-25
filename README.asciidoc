@@ -8,8 +8,10 @@
 :webstorage: http://en.wikipedia.org/wiki/Web_Storage[Web&nbsp;Storage]
 :stylus: http://learnboost.github.com/stylus/[Stylus]
 :jquery: http://jquery.com/[jQuery]
+:selenium: http://seleniumhq.org/[Selenium]
 
-Versions 1.0 and 2.0 of the 'Routeless Backbone.js Contacts' tutorial.
+Versions 1.0, 2.0 and 3.0 of the 'Routeless Backbone.js Contacts'
+tutorial.
 
 'Routeless Backbone.js Contacts' is a totally client-side CRUD
 tutorial application written using {coffeescript}, {stylus},
@@ -20,10 +22,16 @@ readable well structured web applications.
 - The contacts data is persisted locally using browser {webstorage}.
 - Templates are written using {underscore} templates (included with
   {backbone}).
+- Tested with {selenium}.
 
 [cols="2,5,3",width="75%",options="header"]
 |==========================================
 |Version |Documentation |Source
+
+|3.0
+|http://srackham.wordpress.com/2011/10/25/testing-coffeescript-apps-with-selenium/[Testing
+CoffeeScript apps with Selenium]
+|At tag 3.0
 
 |2.0
 |http://srackham.wordpress.com/2011/10/02/routeless-backbone-contacts-2-0/[Routeless Backbone Contacts 2.0]
